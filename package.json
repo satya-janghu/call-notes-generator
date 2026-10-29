@@ -1,0 +1,54 @@
+{
+  "name": "callnotes",
+  "version": "1.0.0",
+  "description": "Generate client-facing call notes from Basecamp project activity",
+  "homepage": "https://github.com/satya-janghu/call-notes-generator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/satya-janghu/call-notes-generator.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "bin": {
+    "callnotes": "./dist/bin/cli.js"
+  },
+  "scripts": {
+    "start": "node dist/bin/cli.js",
+    "dev": "tsx watch bin/cli.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "basecamp",
+    "call-notes",
+    "gemini",
+    "ai",
+    "marketing-automation",
+    "client-reporting"
+  ],
+  "author": "Satya Janghu <satya@getsatya.com> (https://getsatya.com)",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "@google/genai": "^1.30.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.0.1",
+    "open": "^10.1.0",
+    "p-limit": "^6.2.0",
+    "p-retry": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.15.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^4.0.15",
+    "supertest": "^7.1.4",
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3",
+    "vitest": "^4.0.15"
+  }
+}

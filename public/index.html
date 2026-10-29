@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Call Notes Generator</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script>
+    // Apply saved theme immediately to prevent flash of wrong theme
+    (function() {
+      var saved = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+      </button>
+      <h1>Call Notes Generator</h1>
+      <p>Generate client-facing call notes from Basecamp activity</p>
+    </header>
+
+    <!-- Previous Notes Section -->
+    <div class="card input-section" id="section-previous">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Previous Call Notes (Optional)</h2>
+          <p class="card-subtitle">Paste notes from your last call to track progress</p>
+        </div>
+      </div>
+
+      <label for="previous-notes">Previous notes markdown</label>
+      <textarea id="previous-notes" placeholder="Paste your previous call notes here...
+
+This helps track task progress between calls. Images will be automatically removed to save tokens."></textarea>
+      <p class="input-hint">Images will be automatically stripped before processing.</p>
+    </div>
+
+    <!-- Activity Log Section -->
+    <div class="card input-section" id="section-activity">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Basecamp Activity Log</h2>
+          <p class="card-subtitle">Paste the activity log to generate notes from</p>
+        </div>
+      </div>
+
+      <label for="activity-log">Activity log text</label>
+      <textarea id="activity-log" placeholder="Paste your Basecamp activity log here...
+
+Example:
+Activity for Client Name - Last 7 days
+
+John D. completed Fix meta title duplicates
+https://3.basecamp.com/1234567/buckets/12345678/todos/123456789"></textarea>
+
+      <div class="url-preview empty" id="url-preview">
+        Paste activity log to see extracted URLs
+      </div>
+
+      <label for="joint-url" style="margin-top: 1rem;">Joint Basecamp URL (Optional)</label>
+      <input type="url" id="joint-url" placeholder="https://3.basecamp.com/...">
+      <p class="input-hint">If this client has a shared Basecamp project, tasks from it will receive stricter content filtering.</p>
+
+      <!-- Validation error banner -->
+      <div class="error-banner hidden" id="validation-error" role="alert"></div>
+
+      <div class="btn-group btn-group-right">
+        <button class="btn btn-primary" onclick="startGeneration()" id="generate-btn">Generate Call Notes</button>
+      </div>
+    </div>
+
+    <!-- Output Section (hidden initially) -->
+    <div class="card output-section hidden" id="section-output">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Call Notes</h2>
+          <p class="card-subtitle" id="output-subtitle">Generating...</p>
+        </div>
+      </div>
+
+      <!-- Success banner (hidden initially) -->
+      <div class="success-banner hidden" id="success-banner" role="alert">
+        <span class="success-banner-icon">&#10003;</span>
+        <div>
+          <span class="success-banner-text">Generated Successfully</span>
+          <span class="success-banner-stats" id="success-stats"></span>
+        </div>
+      </div>
+
+      <!-- Error banner (hidden initially) -->
+      <div class="error-banner hidden" id="error-banner" role="alert">
+        <div class="error-banner-text" id="error-text"></div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-container" id="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Starting...</div>
+        <button class="btn btn-secondary hidden" id="cancel-btn" onclick="cancelGeneration()" style="margin-top: 0.75rem;">Cancel</button>
+      </div>
+
+      <!-- Output -->
+      <div class="output-container">
+        <pre class="output-content" id="output-content"></pre>
+      </div>
+
+      <div class="btn-group btn-group-between">
+        <button class="btn btn-secondary" onclick="startOver()">Start Over</button>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-secondary" onclick="downloadMarkdown()" id="download-btn" disabled>Download .md</button>
+          <button class="btn btn-success" onclick="copyToClipboard()" id="copy-btn" disabled>★ Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification for image stripping -->
+  <div class="toast hidden" id="image-stripped-toast" role="status" aria-live="polite"></div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <img src="/images/satya.png" alt="Satya Janghu" class="footer-avatar">
+      <div class="footer-info">
+        <span class="footer-credit">Created by <a href="https://getsatya.com" target="_blank" rel="noopener" class="footer-link">Satya Janghu</a></span>
+        <a href="mailto:satya@getsatya.com?subject=Call%20Notes%20Generator%20Feedback" class="footer-link">satya@getsatya.com →</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

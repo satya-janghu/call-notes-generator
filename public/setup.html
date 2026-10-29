@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup - Call Notes Generator</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script>
+    // Apply saved theme immediately to prevent flash of wrong theme
+    (function() {
+      var saved = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+      </button>
+      <h1>Call Notes Generator Setup</h1>
+      <p>Configure your API credentials to get started</p>
+    </header>
+
+    <!-- Steps indicator -->
+    <nav class="steps" aria-label="Setup progress">
+      <div class="step active" id="step-indicator-1" aria-current="step">
+        <span class="step-number" aria-hidden="true">1</span>
+        <span>Basecamp App</span>
+      </div>
+      <div class="step-divider" aria-hidden="true"></div>
+      <div class="step" id="step-indicator-2">
+        <span class="step-number" aria-hidden="true">2</span>
+        <span>Connect Account</span>
+      </div>
+      <div class="step-divider" aria-hidden="true"></div>
+      <div class="step" id="step-indicator-3">
+        <span class="step-number" aria-hidden="true">3</span>
+        <span>Gemini AI</span>
+      </div>
+    </nav>
+
+    <!-- Error display -->
+    <div class="error-banner hidden" id="error-banner" role="alert">
+      <div class="error-banner-text" id="error-text"></div>
+    </div>
+
+    <!-- Step 1: Basecamp App Registration -->
+    <div class="card setup-step active" id="step-1">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Step 1: Register Basecamp App</h2>
+          <p class="card-subtitle">Create an integration to connect with Basecamp</p>
+        </div>
+      </div>
+
+      <div class="setup-info">
+        Go to <a href="https://launchpad.37signals.com/integrations" target="_blank">Basecamp Integrations</a> and create a new app with these settings:
+      </div>
+
+      <div class="copy-field">
+        <label for="app-name" style="width: 120px; margin: 0; display: flex; align-items: center;">App Name:</label>
+        <input type="text" value="callnotes" id="app-name" readonly>
+        <button class="btn btn-secondary" onclick="copyField('app-name')">Copy</button>
+      </div>
+
+      <div class="copy-field">
+        <label for="company-name" style="width: 120px; margin: 0; display: flex; align-items: center;">Company:</label>
+        <input type="text" placeholder="Your agency name" id="company-name">
+        <button class="btn btn-secondary" onclick="copyField('company-name')">Copy</button>
+      </div>
+
+      <div class="copy-field">
+        <label for="website-url" style="width: 120px; margin: 0; display: flex; align-items: center;">Website URL:</label>
+        <input type="text" value="http://localhost:3000" id="website-url" readonly>
+        <button class="btn btn-secondary" onclick="copyField('website-url')">Copy</button>
+      </div>
+
+      <div class="copy-field">
+        <label for="redirect-uri" style="width: 120px; margin: 0; display: flex; align-items: center;">Redirect URI:</label>
+        <input type="text" value="http://localhost:3000/auth/callback" id="redirect-uri" readonly>
+        <button class="btn btn-secondary" onclick="copyField('redirect-uri')">Copy</button>
+      </div>
+
+      <p class="input-hint">Select "Basecamp 4" as the product. After creating, click on the app name (not the edit icon) to see your credentials.</p>
+
+      <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--gray-200);">
+
+      <label for="client-id">Client ID</label>
+      <input type="text" id="client-id" placeholder="Paste your Client ID here">
+
+      <label for="client-secret" style="margin-top: 1rem;">Client Secret</label>
+      <input type="password" id="client-secret" placeholder="Paste your Client Secret here">
+
+      <div class="btn-group btn-group-right">
+        <button class="btn btn-primary" onclick="saveBasecampCredentials()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Connect Basecamp Account -->
+    <div class="card setup-step" id="step-2">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Step 2: Connect Basecamp Account</h2>
+          <p class="card-subtitle">Authorize access to your Basecamp account</p>
+        </div>
+      </div>
+
+      <div class="setup-info">
+        Click the button below to authorize Call Notes Generator to access your Basecamp account. You'll be redirected to Basecamp to approve the connection.
+      </div>
+
+      <div class="btn-group btn-group-right">
+        <button class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+        <a href="/auth/setup" class="btn btn-primary">Connect to Basecamp</a>
+      </div>
+    </div>
+
+    <!-- Step 3: Gemini API Key -->
+    <div class="card setup-step" id="step-3">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Step 3: Add Gemini API Key</h2>
+          <p class="card-subtitle">Enable AI-powered summarization</p>
+        </div>
+      </div>
+
+      <div class="setup-info">
+        Go to <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a>, click "Create API Key", and paste it below.
+      </div>
+
+      <label for="gemini-key">Gemini API Key</label>
+      <input type="password" id="gemini-key" placeholder="Paste your API key here">
+      <p class="input-hint">Your API key is stored locally and never sent to any server except Google's API.</p>
+
+      <div class="btn-group btn-group-right">
+        <button class="btn btn-primary" onclick="saveGeminiKey()">Complete Setup</button>
+      </div>
+    </div>
+
+    <!-- Setup Complete -->
+    <div class="card setup-step" id="step-complete">
+      <div class="success-banner">
+        <span class="success-banner-icon">&#10003;</span>
+        <div>
+          <div class="success-banner-text">Setup Complete!</div>
+          <div class="success-banner-stats">All credentials configured successfully</div>
+        </div>
+      </div>
+
+      <div class="btn-group btn-group-right">
+        <a href="/" class="btn btn-success">Start Using Call Notes Generator</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <img src="/images/satya.png" alt="Satya Janghu" class="footer-avatar">
+      <div class="footer-info">
+        <span class="footer-credit">Created by <a href="https://getsatya.com" target="_blank" rel="noopener" class="footer-link">Satya Janghu</a></span>
+        <a href="mailto:satya@getsatya.com?subject=Call%20Notes%20Generator%20Feedback" class="footer-link">satya@getsatya.com →</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Theme toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+
+    // Check current status on load
+    async function checkStatus() {
+      try {
+        const response = await fetch('/auth/status');
+        const status = await response.json();
+
+        // Handle URL params for errors or step navigation
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get('error');
+        const step = params.get('step');
+
+        if (error) {
+          showError(getErrorMessage(error));
+        }
+
+        if (status.isComplete) {
+          goToStep('complete');
+        } else if (step === 'gemini' || (status.hasBasecampCredentials && status.hasBasecampTokens)) {
+          goToStep(3);
+        } else if (status.hasBasecampCredentials) {
+          goToStep(2);
+        } else {
+          goToStep(1);
+        }
+      } catch (error) {
+        console.error('Failed to check status:', error);
+      }
+    }
+
+    function getErrorMessage(code) {
+      const messages = {
+        'missing_credentials': 'Please enter your Basecamp credentials first.',
+        'oauth_start_failed': 'Failed to start authorization. Please check your credentials.',
+        'oauth_denied': 'Authorization was denied. Please try again.',
+        'no_code': 'No authorization code received. Please try again.',
+        'token_exchange_failed': 'Failed to complete authorization. Please try again.',
+        'invalid_state': 'Authorization could not be verified. Please click Connect to Basecamp again.',
+      };
+      return messages[code] || 'An error occurred. Please try again.';
+    }
+
+    function showError(message) {
+      const banner = document.getElementById('error-banner');
+      const text = document.getElementById('error-text');
+      text.textContent = message;
+      banner.classList.remove('hidden');
+    }
+
+    function hideError() {
+      document.getElementById('error-banner').classList.add('hidden');
+    }
+
+    function goToStep(step) {
+      hideError();
+
+      // Hide all steps
+      document.querySelectorAll('.setup-step').forEach(el => el.classList.remove('active'));
+
+      // Update indicators
+      for (let i = 1; i <= 3; i++) {
+        const indicator = document.getElementById(`step-indicator-${i}`);
+        indicator.classList.remove('active', 'completed');
+        indicator.removeAttribute('aria-current');
+        if (i < step) {
+          indicator.classList.add('completed');
+        } else if (i === step) {
+          indicator.classList.add('active');
+          indicator.setAttribute('aria-current', 'step');
+        }
+      }
+
+      // Show current step
+      if (step === 'complete') {
+        document.getElementById('step-complete').classList.add('active');
+        document.querySelectorAll('.step').forEach(s => {
+          s.classList.add('completed');
+          s.removeAttribute('aria-current');
+        });
+      } else {
+        document.getElementById(`step-${step}`).classList.add('active');
+      }
+    }
+
+    async function copyField(id) {
+      const input = document.getElementById(id);
+      const btn = input.nextElementSibling;
+      const originalText = btn.textContent;
+
+      try {
+        await navigator.clipboard.writeText(input.value);
+        btn.textContent = 'Copied!';
+      } catch (error) {
+        // Fallback for older browsers
+        input.select();
+        document.execCommand('copy');
+        btn.textContent = 'Copied!';
+      }
+
+      setTimeout(() => btn.textContent = originalText, 1000);
+    }
+
+    async function saveBasecampCredentials() {
+      const clientId = document.getElementById('client-id').value.trim();
+      const clientSecret = document.getElementById('client-secret').value.trim();
+
+      if (!clientId || !clientSecret) {
+        showError('Please enter both Client ID and Client Secret.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/auth/basecamp-credentials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, clientSecret }),
+        });
+
+        if (response.ok) {
+          goToStep(2);
+        } else {
+          const data = await response.json();
+          showError(data.error || 'Failed to save credentials.');
+        }
+      } catch (error) {
+        showError('Failed to save credentials. Please try again.');
+      }
+    }
+
+    async function saveGeminiKey() {
+      const apiKey = document.getElementById('gemini-key').value.trim();
+
+      if (!apiKey) {
+        showError('Please enter your Gemini API key.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/auth/gemini-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey }),
+        });
+
+        if (response.ok) {
+          goToStep('complete');
+        } else {
+          const data = await response.json();
+          showError(data.error || 'Failed to save API key.');
+        }
+      } catch (error) {
+        showError('Failed to save API key. Please try again.');
+      }
+    }
+
+    // Initialize
+    checkStatus();
+  </script>
+</body>
+</html>
